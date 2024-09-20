@@ -28,13 +28,20 @@ class Index extends Component<any, IndexState> {
         }
     }
 
+    /**
+     * Renders the component based on the current state.
+     * @returns JSX representing the rendered component.
+     */
     public render() {
         const {error, user} = this.state;
 
+        // If there's an error, render an error message.
         if (error) {return <div>Error: {error.toString()}</div>;}
 
+        // If user data is not available yet, render a loading message.
         if (!user) {return <div>Loading...</div>;}
 
+        // If user data is available, render user information and a logout button.
         return (
             <div>
                 <h1>Logged in as {user.name}</h1>

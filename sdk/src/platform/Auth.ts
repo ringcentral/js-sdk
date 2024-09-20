@@ -11,6 +11,9 @@ export interface AuthOptionsConstructor extends AuthOptions {
     cacheId: string;
 }
 
+/**
+ * Represents an authentication handler class
+ */
 export default class Auth {
     private _cache: Cache;
 
@@ -24,6 +27,7 @@ export default class Auth {
         this._refreshHandicapMs = refreshHandicapMs;
     }
 
+    // Fetches authentication data from the cache
     public async data(): Promise<AuthData> {
         return (
             (await this._cache.getItem(this._cacheId)) || {
@@ -39,6 +43,7 @@ export default class Auth {
         );
     }
 
+    // Sets authentication data in the cache
     public async setData(newData: AuthData = {}) {
         const data = await this.data();
         const savedData: AuthData = {

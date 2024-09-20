@@ -44,39 +44,68 @@ export class SDK {
 
     public static EventEmitter = EventEmitter;
 
+    /**
+     * Sandbox Server https://platform.devtest.ringcentral.com
+     * Production Server https://platform.ringcentral.com
+     */
     public static server = {
         sandbox: 'https://platform.devtest.ringcentral.com',
         production: 'https://platform.ringcentral.com',
     };
+
+    /**
+     * Handles login redirect by sending authentication response to the opener window.
+     * @param origin The origin to post the message to.
+     * @param win The window object. If not provided, defaults to the global window object.
+     */
     public static handleLoginRedirect(origin, win) {
+        // Use the provided window object or default to the global window object.
         win = win || window;
+
+        // Get the authentication response from the location search or hash.
         const response = win.location.search ? win.location.search : win.location.hash;
+
+        // Create a message object containing the authentication response.
         const msg = {};
         msg[Constants.authResponseProperty] = response;
+
+        // Post the message to the opener window with the specified origin.
         win.opener.postMessage(msg, origin || win.location.origin);
     }
 
+    /**
+     * Constructs a new SDK instance with the provided options.
+     * @param options The SDK options.
+     */
     public constructor(options: SDKOptions = {}) {
+        // Destructure options or use default values.
         const {cachePrefix, defaultRequestInit, handleRateLimit} = options;
+
+        // Warn if using sandbox server (deprecated).
         if (options?.server === SDK.server.sandbox) {
             // eslint-disable-next-line no-console
             console.warn('Sandbox support is deprecated. Please migrate your application to Production Server.');
         }
+
+        // Initialize external dependencies.
         this._externals = new Externals({
             ...defaultExternals,
             ...options,
         });
 
+        // Initialize cache.
         this._cache = new Cache({
             externals: this._externals,
             prefix: cachePrefix,
         });
 
+        // Initialize client.
         this._client = new Client({
             externals: this._externals,
             defaultRequestInit,
         });
 
+        // Initialize platform.
         this._platform = new Platform({
             ...options,
             externals: this._externals,

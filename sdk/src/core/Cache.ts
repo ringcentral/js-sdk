@@ -17,6 +17,12 @@ export default class Cache {
         this._externals = externals;
     }
 
+    /**
+     * Synchronously sets an item in the local storage.
+     * @param {string} key - The key under which to store the data.
+     * @param {any} data - The data to store.
+     * @returns {Object} - Returns the current instance for chaining.
+     */
     public setItemSync(key, data) {
         this._externals.localStorage.setItem(this._prefixKey(key), JSON.stringify(data));
         return this;
@@ -27,6 +33,11 @@ export default class Cache {
         //this.setItemSync(key, data);
     }
 
+    /**
+     * Synchronously removes an item from the local storage.
+     * @param {string} key - The key of the item to remove.
+     * @returns {Object} - Returns the current instance for chaining.
+     */
     public removeItemSync(key) {
         this._externals.localStorage.removeItem(this._prefixKey(key));
         return this;
@@ -37,9 +48,16 @@ export default class Cache {
         //await this.removeItemSync(key);
     }
 
+    /**
+     * Synchronously retrieves an item from the local storage.
+     * @param {string} key - The key of the item to retrieve.
+     * @returns {any} - The retrieved item, or null if the item does not exist.
+     */
     public getItemSync(key) {
         const item = this._externals.localStorage.getItem(this._prefixKey(key));
-        if (!item) {return null;}
+        if (!item) {
+            return null;
+        }
         return JSON.parse(item);
     }
 
@@ -56,13 +74,19 @@ export default class Cache {
             : Object.keys(this._externals.localStorage);
     }
 
+    /**
+     * Asynchronously cleans up the local storage by removing all items with keys prefixed by the specified prefix.
+     * @returns {Object} - Returns the current instance for chaining.
+     */
     public async clean() {
         await Promise.all(
-            (await this._keys()).map(async key => {
+            (
+                await this._keys()
+            ).map(async (key) => {
                 if (key.startsWith(this._prefix)) {
                     await this._externals.localStorage.removeItem(key);
                 }
-            }),
+            })
         );
 
         return this;
